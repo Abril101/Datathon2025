@@ -2,7 +2,7 @@ import time
 import pandas as pd
 import random
 
-# --- Función de estrategia (cópiala de tu app) ---
+# --- Función de estrategia ---
 def estrategia_ind(tipo, banco, monto):
     if tipo == 'Tipo01':
         return 'Interbancario Banamex'
@@ -21,7 +21,7 @@ def estrategia_ind(tipo, banco, monto):
     elif tipo == 'Tipo04':
         return 'Interbancario Banamex'
     else:
-        return 'Sin estrategia'
+        return 'Interbancario Banamex'
 
 # 1) Cobertura de combinaciones límite
 tipos = ['Tipo01', 'Tipo02', 'Tipo03', 'Tipo04', 'SinTipo']
@@ -52,7 +52,7 @@ N = 100_000
 sample_data = pd.DataFrame({
     'TipoCliente': [random.choice(tipos) for _ in range(N)],
     'idBanco':      [random.choice(bancos) for _ in range(N)],
-    'montoExigible': [random.choice(montos) for _ in range(N)],
+    'montoExigible':[random.choice(montos) for _ in range(N)],
 })
 
 start = time.time()
@@ -61,10 +61,16 @@ sample_data['Estrategia'] = sample_data.apply(
     axis=1
 )
 elapsed = time.time() - start
-print(f"\nProcesadas {N} filas en {elapsed:.3f} s — {N/elapsed:.0f} filas/s")
+print(f"\nProcesadas {N} filas en {elapsed:.3f} segundos — {N/elapsed:.0f} filas/segundo")
 
 # 3) Distribución de estrategias en la muestra
 dist = sample_data['Estrategia'].value_counts().reset_index()
 dist.columns = ['Estrategia', 'Count']
+print("\n=== Distribución de Estrategias en la muestra ===")
+print(dist.to_string(index=False))
+
+# prompt: quiero ver de las diferentes estrategias la cantidad
+
+# Imprimir la distribución de estrategias
 print("\n=== Distribución de Estrategias en la muestra ===")
 print(dist.to_string(index=False))

@@ -55,6 +55,8 @@ if upload:
         merged['idBanco'] = merged['idBanco'].fillna(0).astype(int)
         merged['montoExigible'] = merged['montoExigible'].fillna(0)
         merged['BancoOrigen'] = merged['idBanco'].map(banco_map).fillna('Otro Banco')
+                # Filtrar montos no zero
+        merged = merged[merged['montoExigible'] != 0]
         # Calcular estrategia
         merged['Estrategia'] = merged.apply(estrategia_ind, axis=1)
 
@@ -77,5 +79,4 @@ if upload:
         st.dataframe(merged[['idCredito', 'TipoCliente', 'BancoOrigen', 'montoExigible', 'Estrategia']])
 else:
     st.info("Por favor, sube tu archivo CSV con los idCredito.")
-
 
