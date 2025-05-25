@@ -21,19 +21,22 @@ def estrategia_ind(f):
 
     if tipo == 'Tipo01':
         return 'Interbancario Banamex'
-    if tipo == 'Tipo02':
+    elif tipo == 'Tipo02':
         if banco == 14:
             return 'Interbancario Banamex'
-        if banco == 12 and monto >= 1000:
+        elif banco == 12 and monto >= 1000:
             return 'BBVA Matutino'
-        return 'Interbancario Banamex'
-    if tipo == 'Tipo03':
+        else:
+            return 'Interbancario Banamex'
+    elif tipo == 'Tipo03':
         if monto < 300:
             return 'Interbancario Banamex'
-        return 'BBVA Tradicional'
-    if tipo == 'Tipo04':
+        else:
+            return 'BBVA Tradicional'
+    elif tipo == 'Tipo04':
         return 'Interbancario Banamex'
-    return 'Sin estrategia'
+    else:
+        return 'Sin estrategia'
 
 # --- Interfaz principal ---
 st.title("Estrategia de Cobranza para Lista de Créditos")
@@ -51,19 +54,28 @@ if upload:
         merged['TipoCliente'] = merged['TipoCliente'].fillna('Tipo01')
         merged['idBanco'] = merged['idBanco'].fillna(0).astype(int)
         merged['montoExigible'] = merged['montoExigible'].fillna(0)
-        merged['BancoOrigen'] = merged['idBanco'].map(banco_map).fillna('Interbancario')
-        
+        merged['BancoOrigen'] = merged['idBanco'].map(banco_map).fillna('Otro Banco')
         # Calcular estrategia
         merged['Estrategia'] = merged.apply(estrategia_ind, axis=1)
 
         # Mostrar resumen agrupado
         st.subheader("Resumen de Estrategias")
-        resumen = merged.groupby('Estrategia').agg({'idCredito':'count'}).reset_index()
+        resumen = merged['Estrategia'].value_counts().reset_index()
         resumen.columns = ['Estrategia', 'Cantidad']
         st.table(resumen)
 
+        # Mostrar IDs agrupados por estrategia
+        st.subheader("IDs Agrupados por Estrategia")
+        estrategias = merged['Estrategia'].unique()
+        for estr in estrategias:
+            with st.expander(f"{estr} ({merged[merged['Estrategia']==estr].shape[0]} créditos)"):
+                ids = merged.loc[merged['Estrategia']==estr, 'idCredito'].tolist()
+                st.write(ids)
+
         # Mostrar detalle
         st.subheader("Detalle por Crédito")
-        st.dataframe(merged[['idCredito','TipoCliente','BancoOrigen','montoExigible','Estrategia']])
+        st.dataframe(merged[['idCredito', 'TipoCliente', 'BancoOrigen', 'montoExigible', 'Estrategia']])
 else:
     st.info("Por favor, sube tu archivo CSV con los idCredito.")
+
+
